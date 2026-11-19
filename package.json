@@ -12,6 +12,7 @@
     "test:db": "supabase test db"
   },
   "dependencies": {
+    "@nuxtjs/supabase": "^2.1.0",
     "nuxt": "^4.4.8",
     "vue": "^3.5.45",
     "vue-router": "^5.5.1"
