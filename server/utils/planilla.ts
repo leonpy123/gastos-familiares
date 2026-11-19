@@ -33,6 +33,9 @@ export function construirFilas(cs: ComprobanteDetalle[], clase: Clase): (string 
   return [encabezado, ...filas]
 }
 
+const INTENTOS = 3
+const huella = (cs: ComprobanteDetalle[]) => cs.map(c => c.id).sort().join('|')
+
 /** Reescribe ambas hojas desde la base. Nunca lanza: devuelve el resultado y deja registrado el estado. */
 export async function reconciliarPlanilla(deps: {
   repo: RepoPlanilla
@@ -40,10 +43,18 @@ export async function reconciliarPlanilla(deps: {
   ahora: () => Date
 }): Promise<{ ok: true } | { ok: false; error: string }> {
   try {
-    const vigentes = await deps.repo.listarVigentes()
     await deps.sheets.asegurarHojas([HOJAS.ingreso, HOJAS.gasto])
-    await deps.sheets.reemplazarHoja(HOJAS.ingreso, construirFilas(vigentes, 'ingreso'))
-    await deps.sheets.reemplazarHoja(HOJAS.gasto, construirFilas(vigentes, 'gasto'))
+    let vigentes = await deps.repo.listarVigentes()
+    for (let intento = 1; ; intento++) {
+      await deps.sheets.reemplazarHoja(HOJAS.ingreso, construirFilas(vigentes, 'ingreso'))
+      await deps.sheets.reemplazarHoja(HOJAS.gasto, construirFilas(vigentes, 'gasto'))
+      // Otro guardado simultáneo pudo escribir una versión anterior encima: si la base ya no
+      // coincide con lo escrito, se vuelve a escribir con lo actual.
+      const actuales = await deps.repo.listarVigentes()
+      if (huella(actuales) === huella(vigentes)) break
+      if (intento >= INTENTOS) throw new Error('los datos cambiaron mientras se actualizaba la planilla')
+      vigentes = actuales
+    }
     await deps.repo.guardarEstado({ pendiente: false, ultima_sync: deps.ahora().toISOString(), ultimo_error: null })
     return { ok: true }
   } catch (e) {

@@ -61,6 +61,22 @@ describe('reconciliarPlanilla', () => {
     expect(repo.estado).toMatchObject({ pendiente: true, ultimo_error: 'quota' })
   })
 
+  it('si otro guardado cambió la base durante la escritura, vuelve a escribir con los datos nuevos', async () => {
+    let llamadas = 0
+    repo.listarVigentes = async () => (++llamadas === 1 ? [gasto] : [gasto, ingreso])
+    expect(await reconciliarPlanilla(deps)).toEqual({ ok: true })
+    expect(sheets.escritas['Ingresos']).toHaveLength(2)
+    expect(repo.estado).toMatchObject({ pendiente: false })
+  })
+
+  it('si la base no deja de cambiar, queda pendiente para el próximo intento', async () => {
+    let n = 0
+    repo.listarVigentes = async () => [{ ...gasto, id: `g${++n}` }]
+    const r = await reconciliarPlanilla(deps)
+    expect(r.ok).toBe(false)
+    expect(repo.estado).toMatchObject({ pendiente: true })
+  })
+
   it('si la base falla tampoco lanza', async () => {
     repo.listarVigentes = async () => { throw new Error('db caída') }
     expect(await reconciliarPlanilla(deps)).toEqual({ ok: false, error: 'db caída' })
