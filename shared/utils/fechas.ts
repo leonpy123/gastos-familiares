@@ -51,6 +51,14 @@ export function formatearFecha(fechaIso: string): string {
   return `${d}/${m}/${a}`
 }
 
+/** Instante ISO → 'dd/mm/aaaa HH:mm' en hora de Asunción. */
+export function formatearFechaHora(instante: string): string {
+  const partes = Object.fromEntries(new Intl.DateTimeFormat('en-GB', {
+    timeZone: ZONA, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23',
+  }).formatToParts(new Date(instante)).map(p => [p.type, p.value]))
+  return `${partes.day}/${partes.month}/${partes.year} ${partes.hour}:${partes.minute}`
+}
+
 /** ¿Es 'YYYY-MM-DD' una fecha real? */
 export function esFechaIsoValida(fechaIso: string): boolean {
   const r = fechaIso.match(/^(\d{4})-(\d{2})-(\d{2})$/)
