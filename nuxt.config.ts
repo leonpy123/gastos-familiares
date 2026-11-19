@@ -2,6 +2,7 @@ export default defineNuxtConfig({
   compatibilityDate: '2026-11-01',
   devtools: { enabled: false },
   modules: ['@nuxtjs/supabase'],
+  css: ['~/assets/main.css'],
   supabase: {
     // El middleware propio (app/middleware/auth.global.ts) decide las redirecciones.
     redirect: false,
