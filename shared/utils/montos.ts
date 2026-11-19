@@ -1,4 +1,5 @@
 import { normalizar } from './texto'
+import { palabrasANumero } from './numeros'
 
 const MAXIMO = 999_999_999_999
 
@@ -16,6 +17,7 @@ export function parsearMonto(texto: string): number | null {
   else if (/^\d{1,3}( \d{3})+$/.test(t)) valor = Number(t.replace(/ /g, ''))
   else if ((m = t.match(/^(\d+)\s*mil$/))) valor = Number(m[1]) * 1_000
   else if ((m = t.match(/^(\d+)\s*(millon|millones)$/))) valor = Number(m[1]) * 1_000_000
+  else if (/[a-z]/.test(t)) valor = palabrasANumero(t) // "ocho mil", "un millón quinientos mil"
 
   if (valor === null || !Number.isSafeInteger(valor) || valor <= 0 || valor > MAXIMO) return null
   return valor

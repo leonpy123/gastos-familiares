@@ -1,4 +1,5 @@
 import { normalizar } from './texto'
+import { palabrasANumero } from './numeros'
 
 export const ZONA = 'America/Asuncion'
 
@@ -37,8 +38,12 @@ export function parsearFecha(texto: string, ahora: Date): string | null {
   let r: RegExpMatchArray | null
   if ((r = t.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/))) {
     d = Number(r[1]); m = Number(r[2]); a = Number(r[3])
-  } else if ((r = t.match(/^(\d{1,2}) de ([a-z]+)(?: (?:de|del) (\d{4}))?$/))) {
-    d = Number(r[1]); m = MESES.indexOf(r[2]!) + 1; a = r[3] ? Number(r[3]) : anioActual
+  } else if ((r = t.match(new RegExp(`^(.+?) de (${MESES.join('|')})(?: (?:de|del) (.+))?$`)))) {
+    // El día y el año pueden venir en números o en palabras ("dieciocho de noviembre de dos mil veintiséis").
+    const dia = palabrasANumero(r[1]!)
+    const anio = r[3] ? palabrasANumero(r[3]) : anioActual
+    if (dia === null || anio === null) return null
+    d = dia; m = MESES.indexOf(r[2]!) + 1; a = anio
   } else {
     return null
   }

@@ -111,7 +111,9 @@ ingreso tab fecha tab tipo tab concepto tab pagador   tab RUC tab monto
 
 Ejemplo: *gasto tab hoy tab hogar tab almuerzo mediodía tab supermas tab 8002147 tab 8.000*
 
-- Fecha: "hoy", "ayer", "18/11/2026" o "18 de noviembre".
-- RUC sin dígito verificador (la app lo calcula). Monto: "8.000", "8000", "8 mil", "12 millones".
+- Fecha: "hoy", "ayer", "18/11/2026", "18 de noviembre" o "dieciocho de noviembre".
+- RUC sin dígito verificador (la app lo calcula), en números o en palabras por grupos ("ocho cero cero veintiuno cuarenta y siete").
+- Monto: "8.000", "8000", "8 mil", "ocho mil", "un millón quinientos mil".
+- Si el micrófono no reconoce "tab", cambiar el separador en Admin → General por una palabra en español, por ejemplo "siguiente".
 - En Android se usa el botón 🎤; en iPhone, el micrófono del teclado.
 - Siempre se revisa el formulario antes de guardar. Un comprobante guardado no se edita: el administrador lo elimina y se carga de nuevo.

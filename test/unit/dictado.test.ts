@@ -67,6 +67,13 @@ describe('parsearDictado', () => {
   it('monto con coma decimal da error de monto, no de cantidad de campos', () => expect(parsearDictado(
     'gasto tab hoy tab hogar tab pan tab super tab 8002147 tab 1,5 millones', ctx))
     .toEqual({ ok: false, errores: ['No se entendió el monto "1,5 millones".'] }))
+  it('RUC y monto en palabras, como los escribe Chrome', () => expect(parsearDictado(
+    'gasto siguiente hoy siguiente hogar siguiente almuerzo siguiente supermas siguiente ocho cero cero veintiuno cuarenta y siete siguiente ocho mil',
+    { ...ctx, separadores: ['siguiente'] }))
+    .toMatchObject({ ok: true, borrador: { ruc: '8002147', monto: 8000 } }))
+  it('fecha con el día en palabras', () => expect(parsearDictado(
+    'ingreso tab dieciocho de noviembre tab sueldos tab sueldo tab CGR tab 80012457 tab doce millones', ctx))
+    .toMatchObject({ ok: true, borrador: { fecha: '2026-11-18', monto: 12000000 } }))
   it('junta varios errores', () => expect((parsearDictado(
     'gasto tab nunca tab hogar tab a tab b tab 12 tab mucho', ctx) as any).errores).toEqual([
     'No se entendió la fecha "nunca".', 'RUC inválido "12".', 'No se entendió el monto "mucho".']))
