@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { ItemResumen } from '../../shared/types'
-import { formatearGs } from '../../shared/utils/montos'
+import type { ItemResumen } from '#shared/types'
+import { formatearGs } from '#shared/utils/montos'
 
 defineProps<{ titulo: string; items: ItemResumen[] }>()
 </script>

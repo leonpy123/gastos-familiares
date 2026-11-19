@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Clase, Tipo } from '../../../shared/types'
+import type { Clase, Tipo } from '#shared/types'
 
 const supabase = useSupabaseClient()
 const { tipos, cargar } = useTipos()

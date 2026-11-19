@@ -1,4 +1,4 @@
-import { esIOS } from '../../shared/utils/plataforma'
+import { esIOS } from '#shared/utils/plataforma'
 
 /**
  * Micrófono con la Web Speech API (Android / Chrome). En iPhone no se usa: allí se dicta

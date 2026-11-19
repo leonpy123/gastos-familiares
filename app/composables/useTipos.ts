@@ -1,5 +1,5 @@
-import type { Tipo } from '../../shared/types'
-import { aTipo } from '../../shared/utils/mapeo'
+import type { Tipo } from '#shared/types'
+import { aTipo } from '#shared/utils/mapeo'
 
 /** Todos los tipos (activos e inactivos); filtrar activos donde corresponda. */
 export function useTipos() {

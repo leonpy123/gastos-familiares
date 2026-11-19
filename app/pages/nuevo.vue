@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { BorradorComprobante, Clase } from '../../shared/types'
-import { parsearDictado } from '../../shared/utils/dictado'
-import { validarComprobante } from '../../shared/utils/validacion'
-import { parsearMonto, formatearGs } from '../../shared/utils/montos'
-import { normalizarRuc, formatearRuc } from '../../shared/utils/ruc'
-import { hoyEnAsuncion } from '../../shared/utils/fechas'
+import type { BorradorComprobante, Clase } from '#shared/types'
+import { parsearDictado } from '#shared/utils/dictado'
+import { validarComprobante } from '#shared/utils/validacion'
+import { parsearMonto, formatearGs } from '#shared/utils/montos'
+import { normalizarRuc, formatearRuc } from '#shared/utils/ruc'
+import { hoyEnAsuncion } from '#shared/utils/fechas'
 
 const supabase = useSupabaseClient()
 const { tipos, cargar: cargarTipos } = useTipos()

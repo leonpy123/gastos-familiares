@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { ComprobanteDetalle } from '../../shared/types'
-import { calcularResumen, rangoPeriodo } from '../../shared/utils/resumen'
-import { formatearGs } from '../../shared/utils/montos'
+import type { ComprobanteDetalle } from '#shared/types'
+import { calcularResumen, rangoPeriodo } from '#shared/utils/resumen'
+import { formatearGs } from '#shared/utils/montos'
 import { MESES } from '../composables/useComprobantes'
 
 const periodo = usePeriodo()

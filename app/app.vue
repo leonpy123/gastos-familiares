@@ -3,6 +3,7 @@ const { miembro, esAdmin } = useMiembro()
 </script>
 
 <template>
+  <NuxtPwaManifest />
   <NuxtPage />
   <nav v-if="miembro" class="inferior">
     <NuxtLink to="/" exact-active-class="router-link-active"><span class="icono">📊</span>Inicio</NuxtLink>

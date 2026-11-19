@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { formatearGs } from '../../../shared/utils/montos'
-import { formatearFecha, formatearFechaHora } from '../../../shared/utils/fechas'
-import { formatearRuc } from '../../../shared/utils/ruc'
+import { formatearGs } from '#shared/utils/montos'
+import { formatearFecha, formatearFechaHora } from '#shared/utils/fechas'
+import { formatearRuc } from '#shared/utils/ruc'
 
 interface Eliminado {
   id: string; clase: 'ingreso' | 'gasto'; fecha: string; concepto: string; contraparte: string

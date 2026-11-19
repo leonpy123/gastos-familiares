@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { parsearSeparadores } from '../../../shared/utils/separadores'
-import { formatearFechaHora } from '../../../shared/utils/fechas'
+import { parsearSeparadores } from '#shared/utils/separadores'
+import { formatearFechaHora } from '#shared/utils/fechas'
 
 const supabase = useSupabaseClient()
 const { tipos, cargar: cargarTipos } = useTipos()

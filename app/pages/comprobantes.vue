@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { ComprobanteDetalle } from '../../shared/types'
-import { rangoPeriodo } from '../../shared/utils/resumen'
-import { formatearGs } from '../../shared/utils/montos'
-import { formatearFecha } from '../../shared/utils/fechas'
-import { formatearRuc } from '../../shared/utils/ruc'
+import type { ComprobanteDetalle } from '#shared/types'
+import { rangoPeriodo } from '#shared/utils/resumen'
+import { formatearGs } from '#shared/utils/montos'
+import { formatearFecha } from '#shared/utils/fechas'
+import { formatearRuc } from '#shared/utils/ruc'
 
 const periodo = usePeriodo()
 const { esAdmin } = useMiembro()

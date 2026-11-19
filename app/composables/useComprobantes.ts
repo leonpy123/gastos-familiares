@@ -1,6 +1,6 @@
-import type { ComprobanteDetalle } from '../../shared/types'
-import { aDetalle, SELECT_DETALLE, type FilaDetalle } from '../../shared/utils/mapeo'
-import { hoyEnAsuncion } from '../../shared/utils/fechas'
+import type { ComprobanteDetalle } from '#shared/types'
+import { aDetalle, SELECT_DETALLE, type FilaDetalle } from '#shared/utils/mapeo'
+import { hoyEnAsuncion } from '#shared/utils/fechas'
 
 const PAGINA = 1000
 
