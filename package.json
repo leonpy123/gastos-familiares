@@ -8,7 +8,8 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:db": "supabase test db"
   },
   "dependencies": {
     "nuxt": "^4.4.8",
@@ -16,6 +17,7 @@
     "vue-router": "^5.5.1"
   },
   "devDependencies": {
+    "supabase": "^3.2.0",
     "typescript": "^7.0.2",
     "vitest": "^5.1.1"
   }
