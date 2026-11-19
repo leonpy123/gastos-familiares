@@ -27,8 +27,10 @@ async function guardarSeparadores() {
   error.value = ''
   const r = parsearSeparadores(texto.value, tipos.value)
   if (!r.ok) { error.value = r.error; return }
-  const { error: e } = await supabase.from('configuracion').update({ valor: r.valor }).eq('clave', 'separadores_dictado')
-  if (e) { error.value = 'No se pudo guardar.'; return }
+  // upsert: crea la fila si no existe; .select() confirma que quedó guardada.
+  const { data, error: e } = await supabase.from('configuracion')
+    .upsert({ clave: 'separadores_dictado', valor: r.valor }).select('valor')
+  if (e || !data?.length) { error.value = `No se pudo guardar${e?.message ? `: ${e.message}` : '.'}`; return }
   separadores.value = r.valor
   texto.value = r.valor.join(', ')
   mensaje.value = 'Separadores guardados.'
