@@ -15,6 +15,6 @@ describe('parsearSeparadores', () => {
   it('números o símbolos', () => expect(parsearSeparadores('tab, 12', tipos)).toEqual({ ok: false, error: 'Solo palabras, sin números ni símbolos.' }))
   it('palabra clave de un tipo', () => expect(parsearSeparadores('hogar', tipos)).toEqual({ ok: false, error: '"hogar" ya es un tipo; elige otra palabra.' }))
   it('nombre de un tipo', () => expect(parsearSeparadores('sueldos', tipos)).toEqual({ ok: false, error: '"sueldos" ya es un tipo; elige otra palabra.' }))
-  it.each(['gasto', 'ingreso', 'hoy', 'ayer'])('palabra reservada del dictado %s', p =>
+  it.each(['gasto', 'ingreso', 'hoy', 'ayer', 'eliminar'])('palabra reservada del dictado %s', p =>
     expect(parsearSeparadores(p, tipos)).toEqual({ ok: false, error: `"${p}" se usa en el dictado; elige otra palabra.` }))
 })

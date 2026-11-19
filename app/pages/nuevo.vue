@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { BorradorComprobante, Clase } from '#shared/types'
-import { analizarDictadoParcial, parsearDictado, type CampoDictado } from '#shared/utils/dictado'
+import { analizarDictadoParcial, parsearDictado, CAMPOS, type CampoDictado } from '#shared/utils/dictado'
 import { validarComprobante } from '#shared/utils/validacion'
 import { parsearMonto, formatearGs } from '#shared/utils/montos'
 import { normalizarRuc, formatearRuc } from '#shared/utils/ruc'
@@ -62,9 +62,10 @@ const opcionesTipo = computed(() => {
 watch(parcial, (p) => {
   if (!enDictado.value || !textoVivo.value.trim()) return
   if (p.clase) clase.value = p.clase
+  const indice = CAMPOS.indexOf(p.campoActual)
   nextTick(() => {
     if (p.fecha) form.fecha = p.fecha
-    if (p.tipoId) form.tipoId = p.tipoId
+    if (indice >= 2) form.tipoId = p.tipoId ?? '' // "eliminar" en el tipo también lo vacía
     form.concepto = p.concepto
     form.contraparte = p.contraparte
     form.ruc = p.ruc
@@ -171,6 +172,7 @@ async function guardar() {
       <p class="ayuda">
         Orden: <b>gasto/ingreso</b> · fecha · tipo · concepto · proveedor/pagador · RUC (sin dígito) · monto.
         Separa cada campo diciendo «{{ separador }}» o con una coma.
+        Para corregir, di «eliminar»: borra el campo que estás dictando; justo después de «{{ separador }}», vuelve al campo anterior.
         <template v-if="!voz.soportado.value">En iPhone usa el micrófono del teclado.</template>
       </p>
       <div class="fila" style="margin-top: 8px">

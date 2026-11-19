@@ -74,6 +74,17 @@ describe('parsearDictado', () => {
   it('fecha con el día en palabras', () => expect(parsearDictado(
     'ingreso tab dieciocho de noviembre tab sueldos tab sueldo tab CGR tab 80012457 tab doce millones', ctx))
     .toMatchObject({ ok: true, borrador: { fecha: '2026-11-18', monto: 12000000 } }))
+  it('"eliminar" borra lo dicho en el campo actual', () => expect(parsearDictado(
+    'gasto tab hoy tab hogar tab almuerso eliminar almuerzo tab super tab 8002147 tab 8000', ctx))
+    .toMatchObject({ ok: true, borrador: { concepto: 'almuerzo', contraparte: 'super' } }))
+  it('"eliminar" justo después del separador vuelve al campo anterior', () => expect(parsearDictado(
+    'gasto tab hoy tab hogar tab almuerzo tab Eliminar. almuerzo grande tab super tab 8002147 tab 8000', ctx))
+    .toMatchObject({ ok: true, borrador: { concepto: 'almuerzo grande', contraparte: 'super' } }))
+  it('"eliminar" dos veces seguidas retrocede dos campos', () => expect(parsearDictado(
+    'gasto tab hoy tab prestamos tab cuota tab eliminar eliminar hogar tab cuota tab banco tab 8002147 tab 8000', ctx))
+    .toMatchObject({ ok: true, borrador: { tipoId: idHogar, concepto: 'cuota', contraparte: 'banco' } }))
+  it('"eliminar" al principio no rompe nada', () => expect(parsearDictado(
+    'eliminar gasto tab hoy tab hogar tab a tab b tab 8002147 tab 8000', ctx).ok).toBe(true))
   it('junta varios errores', () => expect((parsearDictado(
     'gasto tab nunca tab hogar tab a tab b tab 12 tab mucho', ctx) as any).errores).toEqual([
     'No se entendió la fecha "nunca".', 'RUC inválido "12".', 'No se entendió el monto "mucho".']))

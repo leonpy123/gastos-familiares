@@ -39,9 +39,31 @@ function dividirCampos(texto: string, separadores: string[]): string[] {
   const palabras = separadores.map(s => s.trim()).filter(Boolean).map(escapar)
   if (palabras.length) {
     const re = new RegExp(`(?<![\\p{L}\\p{N}])(?:${palabras.join('|')})(?![\\p{L}\\p{N}])`, 'iu')
-    if (re.test(texto)) return texto.split(new RegExp(re.source, 'giu')).map(limpiarCampo)
+    if (re.test(texto)) return aplicarEliminar(texto.split(new RegExp(re.source, 'giu')))
   }
-  return texto.split(',').map(limpiarCampo)
+  return aplicarEliminar(texto.split(','))
+}
+
+/** Palabra para corregir mientras se dicta. */
+export const PALABRA_ELIMINAR = 'eliminar'
+const RE_ELIMINAR = new RegExp(`(?<![\\p{L}\\p{N}])${PALABRA_ELIMINAR}(?![\\p{L}\\p{N}])`, 'iu')
+
+/**
+ * "eliminar" dentro de un campo borra lo dicho antes en ese campo.
+ * Si el campo todavía estaba vacío (se dijo justo después del separador), vuelve al campo anterior y lo borra.
+ */
+function aplicarEliminar(crudos: string[]): string[] {
+  const campos: string[] = []
+  for (const crudo of crudos) {
+    const partes = crudo.split(new RegExp(RE_ELIMINAR.source, 'giu'))
+    let actual = partes[0] ?? ''
+    for (const siguiente of partes.slice(1)) {
+      if (!limpiarCampo(actual)) campos.pop() // campo vacío: retroceder al anterior
+      actual = siguiente
+    }
+    campos.push(limpiarCampo(actual))
+  }
+  return campos
 }
 
 function parsearClase(texto: string): Clase | null {

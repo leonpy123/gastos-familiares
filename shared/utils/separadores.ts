@@ -1,7 +1,7 @@
 import type { Tipo } from '../types'
 import { normalizar } from './texto'
 
-const RESERVADAS = ['gasto', 'gastos', 'ingreso', 'ingresos', 'hoy', 'ayer', 'de', 'del', 'mil', 'millon', 'millones']
+const RESERVADAS = ['gasto', 'gastos', 'ingreso', 'ingresos', 'hoy', 'ayer', 'de', 'del', 'mil', 'millon', 'millones', 'eliminar']
 
 /** Valida la lista de palabras separadoras que escribe el admin ("tab, tap"). */
 export function parsearSeparadores(

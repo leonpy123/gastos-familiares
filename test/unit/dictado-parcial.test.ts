@@ -29,6 +29,14 @@ describe('analizarDictadoParcial', () => {
     .toMatchObject({ campoActual: 'ruc', ruc: '800' }))
   it('completo', () => expect(p('gasto siguiente hoy siguiente hogar siguiente almuerzo siguiente supermas siguiente 8002147 siguiente ocho mil'))
     .toMatchObject({ campoActual: 'monto', ruc: '8002147', monto: 8000 }))
+  it('"eliminar" vacía el campo actual en vivo', () =>
+    expect(p('gasto siguiente hoy siguiente hogar siguiente almuerso eliminar'))
+      .toMatchObject({ campoActual: 'concepto', concepto: '' }))
+  it('"eliminar" después del separador vuelve al tipo y muestra las opciones', () => {
+    const r = p('gasto siguiente hoy siguiente hogar siguiente eliminar')
+    expect(r).toMatchObject({ campoActual: 'tipo', tipoId: null })
+    expect(r.sugerenciasTipo.map(t => t.id)).toEqual(['t-hogar', 't-prest'])
+  })
   it('ingreso usa los tipos de ingreso', () =>
     expect(p('ingreso siguiente hoy siguiente').sugerenciasTipo.map(t => t.id)).toEqual(['t-sueldos']))
 })
