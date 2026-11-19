@@ -4,6 +4,7 @@ import { aDetalle, aTipo, SELECT_DETALLE, type FilaDetalle } from '../../shared/
 import type { Miembro, RepoMiembros } from './miembros'
 import type { RepoComprobantes } from './crear-comprobante'
 import type { EstadoPlanilla, RepoPlanilla } from './planilla'
+import { errorSupabase } from './error-supabase'
 
 const COLUMNAS_MIEMBRO = 'id, email, nombre, rol, activo'
 const PAGINA = 1000 // máximo de filas que Supabase devuelve por consulta
@@ -11,28 +12,28 @@ const PAGINA = 1000 // máximo de filas que Supabase devuelve por consulta
 export function crearRepoMiembros(db: SupabaseClient): RepoMiembros {
   return {
     async buscarPorEmail(email) {
-      const { data, error } = await db.from('miembros').select(COLUMNAS_MIEMBRO)
+      const { data, error, status } = await db.from('miembros').select(COLUMNAS_MIEMBRO)
         .eq('email', email.trim().toLowerCase()).maybeSingle()
-      if (error) throw error
+      if (error) throw errorSupabase({ ...error, status }, 'buscar miembro')
       return (data as Miembro | null) ?? null
     },
     async hayAdmin() {
-      const { count, error } = await db.from('miembros').select('id', { count: 'exact', head: true })
+      const { count, error, status } = await db.from('miembros').select('id', { count: 'exact', head: true })
         .eq('rol', 'admin').eq('activo', true)
-      if (error) throw error
+      if (error) throw errorSupabase({ ...error, status }, 'buscar admin')
       return (count ?? 0) > 0
     },
     async crear(m) {
-      const { data, error } = await db.from('miembros').insert(m).select(COLUMNAS_MIEMBRO).single()
-      if (error) throw error
+      const { data, error, status } = await db.from('miembros').insert(m).select(COLUMNAS_MIEMBRO).single()
+      if (error) throw errorSupabase({ ...error, status }, 'crear admin inicial')
       return data as Miembro
     },
   }
 }
 
 export async function listarTipos(db: SupabaseClient): Promise<Tipo[]> {
-  const { data, error } = await db.from('tipos').select('id, clase, nombre, palabras_clave, activo')
-  if (error) throw error
+  const { data, error, status } = await db.from('tipos').select('id, clase, nombre, palabras_clave, activo')
+  if (error) throw errorSupabase({ ...error, status }, 'listar tipos')
   return (data ?? []).map(aTipo)
 }
 
@@ -40,17 +41,17 @@ export async function listarTipos(db: SupabaseClient): Promise<Tipo[]> {
 export function crearRepoComprobantes(db: SupabaseClient): RepoComprobantes {
   return {
     async buscar(id) {
-      const { data, error } = await db.from('comprobantes').select('id').eq('id', id).maybeSingle()
-      if (error) throw error
+      const { data, error, status } = await db.from('comprobantes').select('id').eq('id', id).maybeSingle()
+      if (error) throw errorSupabase({ ...error, status }, 'buscar comprobante')
       return data
     },
     async insertar(c) {
-      const { error } = await db.from('comprobantes').insert({
+      const { error, status } = await db.from('comprobantes').insert({
         id: c.id, clase: c.clase, fecha: c.fecha, tipo_id: c.tipoId, concepto: c.concepto,
         contraparte: c.contraparte, ruc: c.ruc, ruc_dv: c.rucDv, monto: c.monto,
       })
       if (error?.code === '23505') return 'duplicado'
-      if (error) throw error
+      if (error) throw errorSupabase({ ...error, status }, 'insertar comprobante')
       return 'insertado'
     },
   }
@@ -62,20 +63,20 @@ export function crearRepoPlanilla(db: SupabaseClient): RepoPlanilla {
     async listarVigentes() {
       const todos: ComprobanteDetalle[] = []
       for (let desde = 0; ; desde += PAGINA) {
-        const { data, error } = await db.from('comprobantes').select(SELECT_DETALLE)
+        const { data, error, status } = await db.from('comprobantes').select(SELECT_DETALLE)
           .is('eliminado_en', null).order('creado_en').order('id').range(desde, desde + PAGINA - 1)
-        if (error) throw error
+        if (error) throw errorSupabase({ ...error, status }, 'listar comprobantes')
         const filas = (data ?? []) as unknown as FilaDetalle[]
         todos.push(...filas.map(aDetalle))
         if (filas.length < PAGINA) return todos
       }
     },
     async guardarEstado(cambios: Partial<EstadoPlanilla>) {
-      const { data, error } = await db.from('configuracion').select('valor').eq('clave', 'planilla').maybeSingle()
-      if (error) throw error
+      const { data, error, status } = await db.from('configuracion').select('valor').eq('clave', 'planilla').maybeSingle()
+      if (error) throw errorSupabase({ ...error, status }, 'leer estado planilla')
       const valor = { pendiente: false, ultima_sync: null, ultimo_error: null, ...(data?.valor ?? {}), ...cambios }
-      const { error: e2 } = await db.from('configuracion').upsert({ clave: 'planilla', valor })
-      if (e2) throw e2
+      const { error: e2, status: s2 } = await db.from('configuracion').upsert({ clave: 'planilla', valor })
+      if (e2) throw errorSupabase({ ...e2, status: s2 }, 'guardar estado planilla')
     },
   }
 }
