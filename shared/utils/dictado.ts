@@ -56,8 +56,15 @@ export function parsearDictado(
   ctx: { separadores: string[]; tipos: Tipo[]; ahora: Date },
 ): ResultadoDictado {
   const campos = dividirCampos(texto, ctx.separadores)
+  if (campos.length === 1) {
+    const nombres = ctx.separadores.map(s => `«${s.trim()}»`).filter(s => s !== '«»').join(' o ')
+    return {
+      ok: false,
+      errores: [`No encontré la palabra separadora (${nombres}) entre los campos. Llegó: "${texto.trim()}".`],
+    }
+  }
   const clase = parsearClase(campos[0] ?? '')
-  if (!clase) return { ok: false, errores: ["Debe empezar con 'gasto' o 'ingreso'."] }
+  if (!clase) return { ok: false, errores: [`Debe empezar con "gasto" o "ingreso" (llegó: "${campos[0]}").`] }
 
   if (campos.length !== CAMPOS_DICTADO) {
     const contraparte = clase === 'gasto' ? 'proveedor' : 'pagador'

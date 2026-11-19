@@ -43,7 +43,15 @@ describe('parsearDictado', () => {
   it('cantidad de campos en ingreso dice pagador', () => expect(parsearDictado('ingreso tab hoy', ctx))
     .toEqual({ ok: false, errores: ['Se esperaban 7 campos y se recibieron 2. Orden: ingreso · fecha · tipo · concepto · pagador · RUC · monto.'] }))
   it('primera palabra', () => expect(parsearDictado('compra tab hoy tab hogar tab a tab b tab 8002147 tab 1', ctx))
-    .toEqual({ ok: false, errores: ["Debe empezar con 'gasto' o 'ingreso'."] }))
+    .toEqual({ ok: false, errores: ['Debe empezar con "gasto" o "ingreso" (llegó: "compra").'] }))
+  it('sin palabra separadora: lo dice y muestra lo que llegó', () => expect(parsearDictado(
+    'gasto tav hoy tav hogar tav almuerzo tav supermas tav 8002147 tav 8000', ctx))
+    .toEqual({ ok: false, errores: [
+      'No encontré la palabra separadora («tab» o «tap») entre los campos. Llegó: "gasto tav hoy tav hogar tav almuerzo tav supermas tav 8002147 tav 8000".',
+    ] }))
+  it('"siguiente" como separador', () => expect(parsearDictado(
+    'Gasto siguiente hoy siguiente hogar siguiente almuerzo siguiente supermas siguiente 8002147 siguiente 8000',
+    { ...ctx, separadores: ['siguiente', 'tab', 'tap'] })).toMatchObject({ ok: true, borrador: { concepto: 'almuerzo', monto: 8000 } }))
   it('iOS con punto en cada pausa', () => expect(parsearDictado(
     'Gasto. Tab hoy. Tab hogar. Tab almuerzo. Tab Supermas. Tab 8002147. Tab 8.000.', ctx))
     .toEqual({ ok: true, borrador: { clase: 'gasto', fecha: '2026-11-19', tipoId: idHogar,
