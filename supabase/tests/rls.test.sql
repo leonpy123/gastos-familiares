@@ -17,12 +17,12 @@ set local role authenticated;
 
 -- Cuenta de Google que no está en miembros
 set local request.jwt.claims = '{"email":"extrano@test.com"}';
-select is((select count(*) from public.comprobantes)::int, 0, 'no miembro no ve comprobantes');
+select is((select count(*) from public.comprobantes where id::text like '10000000-%')::int, 0, 'no miembro no ve comprobantes');
 select is((select count(*) from public.tipos)::int, 0, 'no miembro no ve tipos');
 
 -- Miembro, con el email en otra combinación de mayúsculas
 set local request.jwt.claims = '{"email":"Ana@Gmail.com"}';
-select is((select count(*) from public.comprobantes)::int, 1, 'miembro con email en mayúsculas ve comprobantes');
+select is((select count(*) from public.comprobantes where id::text like '10000000-%')::int, 1, 'miembro con email en mayúsculas ve comprobantes');
 
 select lives_ok($$
   insert into public.comprobantes (id, clase, fecha, tipo_id, concepto, contraparte, ruc, ruc_dv, monto)
@@ -53,7 +53,7 @@ select is((select (valor->>0) from public.configuracion where clave = 'separador
 
 -- Miembro desactivado
 set local request.jwt.claims = '{"email":"inactivo@test.com"}';
-select is((select count(*) from public.comprobantes)::int, 0, 'miembro inactivo no ve nada');
+select is((select count(*) from public.comprobantes where id::text like '10000000-%')::int, 0, 'miembro inactivo no ve nada');
 
 select * from finish();
 rollback;

@@ -27,14 +27,20 @@ export function resolverTipo(texto: string, clase: Clase, tipos: Tipo[]): Result
 
 const escapar = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
+/** Quita espacios y la puntuación que el dictado agrega en las pausas (". , ; :") a ambos lados del campo. */
+const limpiarCampo = (c: string) => c.replace(/^[\s.,;:]+|[\s.,;:]+$/g, '')
+
+/**
+ * Si el texto trae la palabra separadora, solo ella separa (las comas dentro de un campo se conservan).
+ * Si no la trae, separan las comas.
+ */
 function dividirCampos(texto: string, separadores: string[]): string[] {
-  let t = texto.trim().replace(/[.\s]+$/, '')
   const palabras = separadores.map(s => s.trim()).filter(Boolean).map(escapar)
   if (palabras.length) {
-    const re = new RegExp(`(?<![\\p{L}\\p{N}])(?:${palabras.join('|')})(?![\\p{L}\\p{N}])`, 'giu')
-    t = t.replace(re, ',')
+    const re = new RegExp(`(?<![\\p{L}\\p{N}])(?:${palabras.join('|')})(?![\\p{L}\\p{N}])`, 'iu')
+    if (re.test(texto)) return texto.split(new RegExp(re.source, 'giu')).map(limpiarCampo)
   }
-  return t.split(',').map(c => c.trim())
+  return texto.split(',').map(limpiarCampo)
 }
 
 function parsearClase(texto: string): Clase | null {

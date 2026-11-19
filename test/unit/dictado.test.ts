@@ -44,6 +44,21 @@ describe('parsearDictado', () => {
     .toEqual({ ok: false, errores: ['Se esperaban 7 campos y se recibieron 2. Orden: ingreso · fecha · tipo · concepto · pagador · RUC · monto.'] }))
   it('primera palabra', () => expect(parsearDictado('compra tab hoy tab hogar tab a tab b tab 8002147 tab 1', ctx))
     .toEqual({ ok: false, errores: ["Debe empezar con 'gasto' o 'ingreso'."] }))
+  it('iOS con punto en cada pausa', () => expect(parsearDictado(
+    'Gasto. Tab hoy. Tab hogar. Tab almuerzo. Tab Supermas. Tab 8002147. Tab 8.000.', ctx))
+    .toEqual({ ok: true, borrador: { clase: 'gasto', fecha: '2026-11-19', tipoId: idHogar,
+      concepto: 'almuerzo', contraparte: 'Supermas', ruc: '8002147', monto: 8000 } }))
+  it('iOS con coma en cada pausa', () => expect(parsearDictado(
+    'Gasto, tab, hoy, tab, hogar, tab, almuerzo, tab, supermas, tab, 8002147, tab, 8.000', ctx))
+    .toMatchObject({ ok: true, borrador: { concepto: 'almuerzo', contraparte: 'supermas', monto: 8000 } }))
+  it('punto y coma o dos puntos junto al separador', () => expect(parsearDictado(
+    'gasto; tab hoy: tab hogar tab almuerzo tab supermas tab 8002147 tab 8000', ctx).ok).toBe(true))
+  it('con palabra separadora, la coma dentro de un campo se conserva', () => expect(parsearDictado(
+    'gasto tab hoy tab hogar tab pan, leche tab super tab 8002147 tab 8000', ctx))
+    .toMatchObject({ ok: true, borrador: { concepto: 'pan, leche' } }))
+  it('monto con coma decimal da error de monto, no de cantidad de campos', () => expect(parsearDictado(
+    'gasto tab hoy tab hogar tab pan tab super tab 8002147 tab 1,5 millones', ctx))
+    .toEqual({ ok: false, errores: ['No se entendió el monto "1,5 millones".'] }))
   it('junta varios errores', () => expect((parsearDictado(
     'gasto tab nunca tab hogar tab a tab b tab 12 tab mucho', ctx) as any).errores).toEqual([
     'No se entendió la fecha "nunca".', 'RUC inválido "12".', 'No se entendió el monto "mucho".']))
