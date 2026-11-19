@@ -1,4 +1,5 @@
 import { esIOS } from '#shared/utils/plataforma'
+import { textoNuevo } from '#shared/utils/voz'
 
 /**
  * Micrófono con la Web Speech API (Android / Chrome). En iPhone no se usa: allí se dicta
@@ -23,7 +24,8 @@ export function useReconocimientoVoz() {
     reconocedor.continuous = true
     reconocedor.interimResults = false
     reconocedor.onresult = (e: any) => {
-      const texto = Array.from(e.results as ArrayLike<any>).map(r => r[0].transcript).join(' ').trim()
+      // e.results es acumulado: solo se agrega lo nuevo (desde e.resultIndex), si no el texto se repite.
+      const texto = textoNuevo(e.results, e.resultIndex)
       if (texto) alTexto(texto)
     }
     reconocedor.onend = () => { escuchando.value = false }

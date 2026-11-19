@@ -70,7 +70,7 @@ export function parsearDictado(
     const contraparte = clase === 'gasto' ? 'proveedor' : 'pagador'
     return {
       ok: false,
-      errores: [`Se esperaban ${CAMPOS_DICTADO} campos y se recibieron ${campos.length}. Orden: ${clase} · fecha · tipo · concepto · ${contraparte} · RUC · monto.`],
+      errores: [`Se esperaban ${CAMPOS_DICTADO} campos y se recibieron ${campos.length}. Orden: ${clase} · fecha · tipo · concepto · ${contraparte} · RUC · monto. Llegó: "${texto.trim()}".`],
     }
   }
 

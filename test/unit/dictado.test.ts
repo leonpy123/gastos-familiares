@@ -39,9 +39,9 @@ describe('parsearDictado', () => {
   it('tipo de ingreso en un gasto se rechaza', () => expect(parsearDictado(
     'gasto tab hoy tab sueldos tab x tab y tab 8002147 tab 8000', ctx).ok).toBe(false))
   it('cantidad de campos', () => expect(parsearDictado('gasto tab hoy tab hogar', ctx))
-    .toEqual({ ok: false, errores: ['Se esperaban 7 campos y se recibieron 3. Orden: gasto · fecha · tipo · concepto · proveedor · RUC · monto.'] }))
+    .toEqual({ ok: false, errores: ['Se esperaban 7 campos y se recibieron 3. Orden: gasto · fecha · tipo · concepto · proveedor · RUC · monto. Llegó: "gasto tab hoy tab hogar".'] }))
   it('cantidad de campos en ingreso dice pagador', () => expect(parsearDictado('ingreso tab hoy', ctx))
-    .toEqual({ ok: false, errores: ['Se esperaban 7 campos y se recibieron 2. Orden: ingreso · fecha · tipo · concepto · pagador · RUC · monto.'] }))
+    .toEqual({ ok: false, errores: ['Se esperaban 7 campos y se recibieron 2. Orden: ingreso · fecha · tipo · concepto · pagador · RUC · monto. Llegó: "ingreso tab hoy".'] }))
   it('primera palabra', () => expect(parsearDictado('compra tab hoy tab hogar tab a tab b tab 8002147 tab 1', ctx))
     .toEqual({ ok: false, errores: ['Debe empezar con "gasto" o "ingreso" (llegó: "compra").'] }))
   it('sin palabra separadora: lo dice y muestra lo que llegó', () => expect(parsearDictado(

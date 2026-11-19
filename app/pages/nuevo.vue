@@ -64,6 +64,8 @@ function interpretar() {
 
 function microfono() {
   if (voz.escuchando.value) return voz.detener()
+  dictado.value = '' // cada toque en "Hablar" empieza un dictado nuevo
+  errores.value = []
   voz.iniciar((texto) => {
     dictado.value = dictado.value ? `${dictado.value} ${texto}` : texto
   })
