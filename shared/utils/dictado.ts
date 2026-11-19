@@ -3,6 +3,7 @@ import { normalizar } from './texto'
 import { parsearFecha } from './fechas'
 import { parsearMonto } from './montos'
 import { normalizarRuc } from './ruc'
+import { palabrasADigitos } from './numeros'
 
 export const CAMPOS_DICTADO = 7
 
@@ -48,6 +49,63 @@ function parsearClase(texto: string): Clase | null {
   if (t === 'gasto' || t === 'gastos') return 'gasto'
   if (t === 'ingreso' || t === 'ingresos') return 'ingreso'
   return null
+}
+
+export const CAMPOS = ['clase', 'fecha', 'tipo', 'concepto', 'contraparte', 'ruc', 'monto'] as const
+export type CampoDictado = typeof CAMPOS[number]
+
+export interface DictadoParcial {
+  /** Campo que se está dictando ahora (el último que empezó). */
+  campoActual: CampoDictado
+  clase: Clase | null
+  fecha: string | null
+  tipoId: string | null
+  /** Solo mientras se dicta el tipo: tipos activos de la clase que empiezan con lo dicho. */
+  sugerenciasTipo: Tipo[]
+  concepto: string
+  contraparte: string
+  /** Dígitos reconocidos hasta ahora (puede estar incompleto). */
+  ruc: string
+  monto: number | null
+}
+
+/** Lo que se puede saber de un dictado a medio decir, para ir llenando el formulario en vivo. */
+export function analizarDictadoParcial(
+  texto: string,
+  ctx: { separadores: string[]; tipos: Tipo[]; ahora: Date },
+): DictadoParcial {
+  const campos = texto.trim() ? dividirCampos(texto, ctx.separadores) : ['']
+  const indice = Math.min(campos.length, CAMPOS.length) - 1
+  const campo = (i: number) => campos[i] ?? ''
+  const clase = parsearClase(campo(0))
+  const campoActual = CAMPOS[indice]!
+
+  let tipoId: string | null = null
+  let sugerenciasTipo: Tipo[] = []
+  if (clase && campos.length > 2) {
+    const tipo = resolverTipo(campo(2), clase, ctx.tipos)
+    if (tipo.ok) tipoId = tipo.tipo.id
+    if (campoActual === 'tipo') {
+      const dicho = normalizar(campo(2))
+      sugerenciasTipo = ctx.tipos.filter(t => t.activo && t.clase === clase &&
+        [t.nombre, ...t.palabras_clave].some(p => normalizar(p).startsWith(dicho)))
+    }
+  }
+
+  const tRuc = campo(5)
+  const ruc = /\p{L}/u.test(tRuc) ? (palabrasADigitos(tRuc) ?? '') : tRuc.replace(/\D/g, '')
+
+  return {
+    campoActual,
+    clase,
+    fecha: campos.length > 1 ? parsearFecha(campo(1), ctx.ahora) : null,
+    tipoId,
+    sugerenciasTipo,
+    concepto: campo(3),
+    contraparte: campo(4),
+    ruc,
+    monto: campos.length > 6 ? parsearMonto(campo(6)) : null,
+  }
 }
 
 /** Interpreta "gasto tab hoy tab hogar tab concepto tab proveedor tab RUC tab monto". */
