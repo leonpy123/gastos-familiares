@@ -1,3 +1,13 @@
+import { esClaveSecreta } from './shared/utils/claves'
+
+// SUPABASE_KEY se envía al navegador: tiene que ser la clave publishable/anon, nunca la secreta.
+for (const nombre of ['SUPABASE_KEY', 'NUXT_PUBLIC_SUPABASE_KEY']) {
+  if (esClaveSecreta(process.env[nombre])) {
+    throw new Error(`${nombre} contiene la clave SECRETA de Supabase y quedaría pública en el navegador. `
+      + 'Pon en SUPABASE_KEY la clave "publishable" (o anon) y la secreta solo en SUPABASE_SECRET_KEY.')
+  }
+}
+
 export default defineNuxtConfig({
   compatibilityDate: '2026-11-01',
   devtools: { enabled: false },
